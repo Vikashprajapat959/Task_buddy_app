@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:task_buddy/Constant/app_constant.dart';
+import 'package:task_buddy/widgets/custome_textfield.dart';
 import 'signup_screen.dart';
+
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -44,24 +47,26 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 20),
-                TextField(
+                CustomTextField(
+                  hintText: "Enter Email",
                   controller: emailController,
-                  decoration: InputDecoration(labelText: "Email"),
                 ),
                 SizedBox(height: 10),
-                TextField(
+                CustomTextField(
+                  hintText: "Enter Password",
                   controller: passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(labelText: "Password"),
                 ),
                 SizedBox(height: 20),
                 ElevatedButton(
+                   style: ElevatedButton.styleFrom(
+    backgroundColor: AppColors.primaryColor,
+    minimumSize: const Size.fromHeight(55), // 👈 Height match karo
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(0),
+    ),
+  ),
                   onPressed: loginUser,
-                  child: Text("Login"),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 48),
-                  ),
-                ),
+                  child: Text("Login",),), 
                 TextButton(
                   onPressed: () {
                     Navigator.push(

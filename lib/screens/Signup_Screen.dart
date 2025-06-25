@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:task_buddy/Constant/app_constant.dart';
+import 'package:task_buddy/widgets/custome_textfield.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -50,30 +52,37 @@ class _SignupScreenState extends State<SignupScreen> {
           child: Column(
             children: [
               const SizedBox(height: 20),
-              TextField(
-                controller: emailController,
-                decoration: const InputDecoration(labelText: "Email"),
-              ),
+             CustomTextField(
+                  hintText: "Enter Email",
+                  controller: emailController,
+                ),
               const SizedBox(height: 10),
-              TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(labelText: "Password"),
-              ),
+              CustomTextField(
+                  hintText: "Enter Password",
+               controller: passwordController,
+                ),
               const SizedBox(height: 10),
-              TextField(
-                controller: confirmController,
-                obscureText: true,
-                decoration: const InputDecoration(labelText: "Confirm Password"),
-              ),
+              CustomTextField(
+                  hintText: "Enter Confirm password",
+                  controller: confirmController,
+                ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: signUpUser,
                 style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 48),
-                ),
+    backgroundColor: AppColors.primaryColor,
+    minimumSize: const Size.fromHeight(55), // 👈 Height match karo
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(0),
+    ),
+  ),
+                onPressed: signUpUser,
                 child: Text("Sign Up"),
               ),
+              TextButton(
+                  onPressed: () {
+                  },
+                  child: Text("Already have an account?Login"),
+                ),
             ],
           ),
         ),
