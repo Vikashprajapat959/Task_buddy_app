@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:task_buddy/Constant/app_constant.dart';
+import 'package:task_buddy/screens/login_screen.dart';
 import 'package:task_buddy/widgets/custome_textfield.dart';
+ import 'package:firebase_auth/firebase_auth.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -13,34 +15,58 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmController = TextEditingController();
+bool isLoading = false;
+  void signUpUser() async {
+  String email = emailController.text.trim();
+  String password = passwordController.text.trim();
+  String confirm = confirmController.text.trim();
 
-  void signUpUser() {
-    String email = emailController.text.trim();
-    String password = passwordController.text.trim();
-    String confirm = confirmController.text.trim();
-
-    if (email.isEmpty || password.isEmpty || confirm.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill all fields")),
-      );
-      return;
-    }
-
-    if (password != confirm) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Passwords do not match")),
-      );
-      return;
-    }
-
-    // 🔐 Firebase sign-up logic yahan aayega
-    print("Signup with: $email / $password");
+  // 🔒 Validation: Sab field bhare ho
+  if (email.isEmpty || password.isEmpty || confirm.isEmpty) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Signup Successful (Demo)")),
+      const SnackBar(content: Text("Please fill all fields")),
+    );
+    return;
+  }
+
+  // 🔒 Password match check
+  if (password != confirm) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Passwords do not match")),
+    );
+    return;
+  }
+
+  // 🔁 Show loading
+  setState(() {
+    isLoading = true;
+  });
+
+  try {
+    // ✅ Firebase pe user create karo
+    await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
     );
 
-    Navigator.pop(context); // Back to LoginScreen
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Signup Successful ✅")),
+    );
+
+    // 🔙 Login screen pe wapas
+    Navigator.pop(context);
+  } on FirebaseAuthException catch (e) {
+    // ❌ Error message show
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Signup failed: ${e.message}")),
+    );
+  } finally {
+    // 🔁 Hide loading
+    setState(() {
+      isLoading = false;
+    });
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -60,13 +86,18 @@ class _SignupScreenState extends State<SignupScreen> {
               CustomTextField(
                   hintText: "Enter Password",
                controller: passwordController,
+               isPassword: true,
                 ),
               const SizedBox(height: 10),
               CustomTextField(
                   hintText: "Enter Confirm password",
                   controller: confirmController,
+                  isPassword: true,
                 ),
               const SizedBox(height: 20),
+              isLoading
+              ? const
+              CircularProgressIndicator():
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
     backgroundColor: AppColors.primaryColor,
@@ -80,6 +111,7 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
               TextButton(
                   onPressed: () {
+                    Navigator.pop(context ,MaterialPageRoute(builder: (_) => LoginScreen()),);//back to login 
                   },
                   child: Text("Already have an account?Login"),
                 ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:task_buddy/Constant/app_constant.dart';
 import 'package:task_buddy/widgets/custome_textfield.dart';
 import 'signup_screen.dart';
+  import 'package:firebase_auth/firebase_auth.dart'; 
 
 
 class LoginScreen extends StatefulWidget {
@@ -13,23 +14,38 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  void loginUser() {
-    String email = emailController.text.trim();
-    String password = passwordController.text.trim();
 
-    if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please enter email & password")),
-      );
-    } else {
-      // 🔐 Firebase logic yahan aayega future me
-      print("Login with: $email / $password");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Login Successful (Demo)")),
-      );
-      Navigator.pushReplacementNamed(context, '/home');
-    }
+
+void loginUser() async {
+  String email = emailController.text.trim();
+  String password = passwordController.text.trim();
+
+  if (email.isEmpty || password.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Please enter email & password")),
+    );
+    return;
   }
+
+  try {
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Login Successful ✅")),
+    );
+
+    // Login ke baad home ya dashboard pe le jao
+    // Navigator.pushReplacementNamed(context, '/home');
+
+  } on FirebaseAuthException catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Login failed: ${e.message}")),
+    );
+  }
+}
 
   @override
   Widget build(BuildContext context) {
