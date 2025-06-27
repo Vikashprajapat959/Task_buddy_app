@@ -11,7 +11,6 @@ class CustomTextField extends StatelessWidget {
     required this.controller,
     this.isPassword = false,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return TextField(
@@ -19,7 +18,8 @@ class CustomTextField extends StatelessWidget {
       obscureText: isPassword,
       decoration: InputDecoration(
         hintText: hintText,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(0)),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(0)),
         contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
     );

@@ -12,7 +12,6 @@ void main() async {
   projectId: "taskbuddyapp-7b38f",
   storageBucket: "taskbuddyapp-7b38f.appspot.com",
 ),
-
 );
   runApp(const TaskBuddyApp());
 }

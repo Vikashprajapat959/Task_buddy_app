@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:task_buddy/Constant/app_constant.dart';
+import 'package:task_buddy/Constants/app_colors.dart';
+import 'package:task_buddy/Constants/app_texts.dart';
 import 'package:task_buddy/screens/login_screen.dart';
+import 'package:task_buddy/utils/custome_Snackbar.dart';
+import 'package:task_buddy/utils/password_validator.dart';
+import 'package:task_buddy/widgets/custome_%20ElevatedButton.dart';
+import 'package:task_buddy/widgets/custome_TextButton.dart';
 import 'package:task_buddy/widgets/custome_textfield.dart';
  import 'package:firebase_auth/firebase_auth.dart';
-
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
-
   @override
   State<SignupScreen> createState() => _SignupScreenState();
 }
-
 class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmController = TextEditingController();
-bool isLoading = false;
+  bool isLoading = false;
   void signUpUser() async {
   String email = emailController.text.trim();
   String password = passwordController.text.trim();
@@ -23,43 +25,34 @@ bool isLoading = false;
 
   // 🔒 Validation: Sab field bhare ho
   if (email.isEmpty || password.isEmpty || confirm.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Please fill all fields")),
-    );
+   CustomSnackBar.show(context, message:AppTexts.fillAllFields,isError: true);
     return;
   }
 
   // 🔒 Password match check
   if (password != confirm) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Passwords do not match")),
-    );
+    CustomSnackBar.show(context, message: AppTexts.passwordsDoNotMatch,isError: true);
     return;
   }
-
   // 🔁 Show loading
   setState(() {
     isLoading = true;
   });
-
+String? passwordError = PasswordValidator.validate(password);
+if(passwordError!=null){CustomSnackBar.show(context, message: passwordError,isError:true);
+return;}
   try {
     // ✅ Firebase pe user create karo
     await FirebaseAuth.instance.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Signup Successful ✅")),
-    );
-
+    CustomSnackBar.show(context, message: AppTexts.signupSuccess);
     // 🔙 Login screen pe wapas
     Navigator.pop(context);
   } on FirebaseAuthException catch (e) {
     // ❌ Error message show
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Signup failed: ${e.message}")),
-    );
+    CustomSnackBar.show(context, message: "${AppTexts.signupFailed} ${e.message}",isError: true);
   } finally {
     // 🔁 Hide loading
     setState(() {
@@ -71,7 +64,7 @@ bool isLoading = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Sign Up")),
+      appBar: AppBar(title: const Text(AppTexts.signupTitle)),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: SingleChildScrollView(
@@ -79,18 +72,18 @@ bool isLoading = false;
             children: [
               const SizedBox(height: 20),
              CustomTextField(
-                  hintText: "Enter Email",
+                  hintText: AppTexts.enterEmail,
                   controller: emailController,
                 ),
               const SizedBox(height: 10),
               CustomTextField(
-                  hintText: "Enter Password",
+                  hintText: AppTexts.enterPassword,
                controller: passwordController,
                isPassword: true,
                 ),
               const SizedBox(height: 10),
               CustomTextField(
-                  hintText: "Enter Confirm password",
+                  hintText: AppTexts.confirmPassword,
                   controller: confirmController,
                   isPassword: true,
                 ),
@@ -98,23 +91,23 @@ bool isLoading = false;
               isLoading
               ? const
               CircularProgressIndicator():
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-    backgroundColor: AppColors.primaryColor,
-    minimumSize: const Size.fromHeight(55), // 👈 Height match karo
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(0),
-    ),
-  ),
+              CustomElevatedButton(
+                   text: AppTexts.signupTitle,
+              
+                  color: AppColors.primaryColor,
+                  fullWidth: true,
                 onPressed: signUpUser,
-                child: Text("Sign Up"),
+               
               ),
-              TextButton(
-                  onPressed: () {
-                    Navigator.pop(context ,MaterialPageRoute(builder: (_) => LoginScreen()),);//back to login 
-                  },
-                  child: Text("Already have an account?Login"),
-                ),
+                    CustomTextButton(
+  text: AppTexts.alreadyHaveAccount,
+  onPressed: () {
+    Navigator.pop(
+      context,
+      MaterialPageRoute(builder: (_) => LoginScreen()),
+    );
+  },
+)
             ],
           ),
         ),

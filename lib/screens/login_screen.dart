@@ -1,102 +1,124 @@
 import 'package:flutter/material.dart';
-import 'package:task_buddy/Constant/app_constant.dart';
-import 'package:task_buddy/widgets/custome_textfield.dart';
-import 'signup_screen.dart';
-  import 'package:firebase_auth/firebase_auth.dart'; 
-
+ import 'package:task_buddy/Constants/app_colors.dart';
+import 'package:task_buddy/Constants/app_texts.dart';
+import 'package:task_buddy/utils/password_validator.dart';
+  import 'package:task_buddy/widgets/custome_%20ElevatedButton.dart';
+import 'package:task_buddy/utils/custome_Snackbar.dart'; 
+  import 'package:task_buddy/widgets/custome_TextButton.dart'; 
+  import 'package:task_buddy/widgets/custome_textfield.dart';
+   import 'signup_screen.dart'; 
+    import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
-  @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
+   @override State<LoginScreen> createState() => _LoginScreenState(); }
 
-class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-
-
+class _LoginScreenState extends State<LoginScreen> { 
+  final TextEditingController phoneController = TextEditingController();
+   final TextEditingController emailController = TextEditingController(); 
+   final TextEditingController passwordController = TextEditingController(); 
+   bool isLoading = false;
 
 void loginUser() async {
-  String email = emailController.text.trim();
-  String password = passwordController.text.trim();
+   String email = emailController.text.trim();
+    String password = passwordController.text.trim();
 
-  if (email.isEmpty || password.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Please enter email & password")),
-    );
-    return;
-  }
+if (email.isEmpty || password.isEmpty) {
+CustomSnackBar.show(context, message: AppTexts.emptyEmailPassword,isError: true);
+  return;
+}
+String? passwordError = PasswordValidator.validate(password);
+if(passwordError!=null){CustomSnackBar.show(context, message: passwordError,isError:true);
+return;
+}
+try {
+  await FirebaseAuth.instance.signInWithEmailAndPassword(
+    email: email,
+    password: password,
+  );
 
-  try {
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
+ CustomSnackBar.show(context, message:AppTexts.loginSuccess);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Login Successful ✅")),
-    );
+  // Navigator.pushReplacementNamed(context, '/home');
 
-    // Login ke baad home ya dashboard pe le jao
-    // Navigator.pushReplacementNamed(context, '/home');
-
-  } on FirebaseAuthException catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Login failed: ${e.message}")),
-    );
-  }
+} on FirebaseAuthException catch (e) {
+ CustomSnackBar.show(context, message: "${AppTexts.loginFailed}${e.message}",isError: true);
+}
 }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                FlutterLogo(size: 80),
-                SizedBox(height: 20),
-                Text(
-                  "TaskBuddy",
-                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 20),
-                CustomTextField(
-                  hintText: "Enter Email",
-                  controller: emailController,
-                ),
-                SizedBox(height: 10),
-                CustomTextField(
-                  hintText: "Enter Password",
-                  controller: passwordController,
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                   style: ElevatedButton.styleFrom(
-    backgroundColor: AppColors.primaryColor,
-    minimumSize: const Size.fromHeight(55), // 👈 Height match karo
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(0),
+void showForgotPasswordDialog(BuildContext context) {
+   final TextEditingController resetEmailController = TextEditingController();
+
+showDialog(
+  context: context,
+  builder: (context) => AlertDialog(
+    title: Text(AppTexts.resetPasswordTitle),
+    content: TextField(
+      controller: resetEmailController,
+      keyboardType: TextInputType.emailAddress,
+      decoration: InputDecoration(hintText: AppTexts.resetPasswordHint),
     ),
-  ),
-                  onPressed: loginUser,
-                  child: Text("Login",),), 
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => SignupScreen()),
-                    );
-                  },
-                  child: Text("Don't have an account? Sign up here"),
-                )
-              ],
-            ),
-          ),
-        ),
+    actions: [
+      TextButton(
+        onPressed: () async {
+          try {
+            await FirebaseAuth.instance.sendPasswordResetEmail(
+              email: resetEmailController.text.trim(),
+            );
+            Navigator.of(context).pop();
+            CustomSnackBar.show(context, message: AppTexts.resetEmailSent);
+            
+          } catch (e) {
+            CustomSnackBar.show(context, message: "${AppTexts.resetError} ${e.toString()}",isError: true);
+          }
+        },
+        child: Text(AppTexts.send),
       ),
-    );
-  }
+    ],
+  ),
+);
+}
+@override Widget build(BuildContext context) {
+   return Scaffold( 
+    body:
+    Padding( padding: const EdgeInsets.all(20.0),
+     child: Center( child: SingleChildScrollView(
+       child: Column(
+         children: [
+           FlutterLogo(size: 80),
+            SizedBox(height: 20), Text(AppTexts.appName, 
+            style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+             ), SizedBox(height: 20), 
+             CustomTextField
+             ( 
+              hintText: AppTexts.enterEmail,
+               controller: emailController,
+                ), SizedBox(height: 10), 
+
+                CustomTextField(
+                   hintText: AppTexts.enterPassword,
+                   controller: passwordController, isPassword: true,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                     CustomTextButton( 
+                      text: AppTexts.forgotPassword, onPressed: () => showForgotPasswordDialog(context),
+                    )]), SizedBox(height: 20), 
+                       isLoading ? 
+                       const CircularProgressIndicator() : CustomElevatedButton(
+                         text: AppTexts.loginTitle, onPressed: loginUser, color: AppColors.primaryColor, fullWidth: true, ),
+                          CustomTextButton( text: AppTexts.dontHaveAccount, onPressed: () {
+                             Navigator.push( context, MaterialPageRoute(builder: (_) => SignupScreen()
+                             ),
+                              )
+                              ;
+                               },
+                                ) 
+                                ],
+                                 ),
+                                  ),
+                                   ),
+                                    ),
+                                     ); 
+                                     } 
 }
