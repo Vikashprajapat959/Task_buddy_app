@@ -3,12 +3,15 @@ class PasswordValidator {
     static String? validate(String password) {
    if (password.isEmpty) {
      return 'Password is required'; 
-     } if (password.length < 8) 
-     {
+     }  
+     if (password.length < 8) 
+      {
        return 'Password must be at least 8 characters';
-        } if (!RegExp(r'[A-Z]').hasMatch(password)) {
+        }
+         if (!RegExp(r'[A-Z]').hasMatch(password)) {
            return 'Must include at least one uppercase letter';
-            } if (!RegExp(r'[a-z]').hasMatch(password))
+            }
+             if (!RegExp(r'[a-z]').hasMatch(password))
              {
                return 'Must include at least one lowercase letter';
                 }

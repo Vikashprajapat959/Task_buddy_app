@@ -8,4 +8,5 @@ class AppColors {
   static const Color hintColor = Colors.grey;
   static const Color errorColor = Colors.redAccent;
   static const Color buttonColor = Color(0xFF4CAF50);
+ 
 }

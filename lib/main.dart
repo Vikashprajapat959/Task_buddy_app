@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:task_buddy/Constants/app_thems.dart';
+import 'package:task_buddy/screens/Home_screen.dart';
+import 'package:task_buddy/screens/forgot_password_screen.dart';
 import 'package:task_buddy/screens/signup_screen.dart';
 import 'screens/login_screen.dart';
  import 'package:firebase_core/firebase_core.dart'; // Agar Firebase use karo to uncomment karo
@@ -22,19 +25,14 @@ class TaskBuddyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'TaskBuddy',
-      theme: ThemeData(
-        primarySwatch: Colors.indigo,
-        scaffoldBackgroundColor: Colors.white,
-        inputDecorationTheme: const InputDecorationTheme(
-          border: OutlineInputBorder(),
-        ),
-      ),
+      theme: AppTheme.lightTheme,
       debugShowCheckedModeBanner: false,
       initialRoute: '/login',
       routes: {
         '/login': (context) =>  LoginScreen(),
-        '/signup': (context) => const SignupScreen(),
-      //  '/home': (context) => HomeScreen(),
+        '/signup': (context) =>  SignupScreen(),
+        '/ForgotPasswordScreen': (context) => ForgotPasswordScreen(),
+        '/Homescreen': (context) => HomeScreen(),
       },
     );
   }
