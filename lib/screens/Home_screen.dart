@@ -3,6 +3,8 @@ import 'package:task_buddy/Constants/app_colors.dart';
 import 'package:task_buddy/Constants/app_texts.dart';
 import 'package:task_buddy/Constants/app_styles.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:task_buddy/screens/Add%20new%20task.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -11,6 +13,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  Map<String, dynamic>? userData;
 
   final List<Map<String, dynamic>> tasks = [
     {
@@ -74,7 +77,20 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   @override
   void initState() {
     _tabController = TabController(length: 3, vsync: this);
+    fetchUserData();
     super.initState();
+  }
+
+  Future<void> fetchUserData() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      if (doc.exists) {
+        setState(() {
+          userData = doc.data();
+        });
+      }
+    }
   }
 
   List<Map<String, dynamic>> getTasks(String status) {
@@ -83,23 +99,23 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-final name = user?.displayName ?? "Guest";
-final photoUrl = user?.photoURL;
+    final name = userData?['name'] ?? 'Guest';
+    final photoUrl = userData?['photoUrl'];
+
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-      title: Row(
+        title: Row(
           children: [
-            // ✅ Profile image with fallback
             CircleAvatar(
               radius: 22,
               backgroundColor: Colors.grey.shade300,
               backgroundImage: photoUrl != null
-                  ? NetworkImage(photoUrl):AssetImage('assets/images/profile.jpg')as
-                  ImageProvider,
+                  ? NetworkImage(photoUrl)
+                  :null
+              //    : const AssetImage('assets/images/default_user.png') as ImageProvider,
             ),
             const SizedBox(width: 12),
             Column(
@@ -114,18 +130,17 @@ final photoUrl = user?.photoURL;
                 ),
               ],
             ),
-            Spacer(),
+            const Spacer(),
             CircleAvatar(
               radius: 20,
-              backgroundColor: AppColors.primaryColor.withOpacity(0.1),child: 
-            IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.person, color: AppColors.primaryColor),
-            ))
+              backgroundColor: AppColors.primaryColor.withOpacity(0.1),
+              child: IconButton(
+                onPressed: () {},
+                icon: Icon(Icons.person, color: AppColors.primaryColor),
+              ),
+            ),
           ],
         ),
-      
-      
         bottom: TabBar(
           controller: _tabController,
           labelColor: AppColors.primaryColor,
@@ -147,22 +162,29 @@ final photoUrl = user?.photoURL;
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+            Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => AddTaskPage(),
+                          ),
+                        );
+        },
         backgroundColor: AppColors.primaryColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
 
   Widget buildTaskList(List<Map<String, dynamic>> taskList) {
     return ListView.builder(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       itemCount: taskList.length,
       itemBuilder: (context, index) {
         final task = taskList[index];
         return Card(
-          margin: EdgeInsets.only(bottom: 12),
+          margin: const EdgeInsets.only(bottom: 12),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           elevation: 1,
           child: ListTile(
