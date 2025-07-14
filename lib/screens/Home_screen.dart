@@ -4,14 +4,15 @@ import 'package:task_buddy/Constants/app_texts.dart';
 import 'package:task_buddy/Constants/app_styles.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:task_buddy/screens/Add%20new%20task.dart';
+import 'package:task_buddy/screens/add_new_task.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   Map<String, dynamic>? userData;
 
@@ -84,7 +85,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   Future<void> fetchUserData() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
-      final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      final doc =
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
       if (doc.exists) {
         setState(() {
           userData = doc.data();
@@ -110,13 +112,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         title: Row(
           children: [
             CircleAvatar(
-              radius: 22,
-              backgroundColor: Colors.grey.shade300,
-              backgroundImage: photoUrl != null
-                  ? NetworkImage(photoUrl)
-                  :null
-              //    : const AssetImage('assets/images/default_user.png') as ImageProvider,
-            ),
+                radius: 22,
+                backgroundColor: Colors.grey.shade300,
+                backgroundImage:
+                    photoUrl != null ? NetworkImage(photoUrl) : null
+                //    : const AssetImage('assets/images/default_user.png') as ImageProvider,
+                ),
             const SizedBox(width: 12),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -163,12 +164,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-            Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => AddTaskPage(),
-                          ),
-                        );
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => AddTaskPage(),
+            ),
+          );
         },
         backgroundColor: AppColors.primaryColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -185,7 +186,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         final task = taskList[index];
         return Card(
           margin: const EdgeInsets.only(bottom: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           elevation: 1,
           child: ListTile(
             leading: Checkbox(value: false, onChanged: (_) {}),
@@ -198,7 +200,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
                         color: task['color'].withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
